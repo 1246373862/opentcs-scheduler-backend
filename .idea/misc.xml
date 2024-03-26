@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ExternalStorageConfigurationManager" enabled="true" />
   <component name="FrameworkDetectionExcludesConfiguration">
@@ -7,6 +8,10 @@
     <option name="originalFiles">
       <list>
         <option value="$PROJECT_DIR$/openTCS-Server/pom.xml" />
+        <option value="$PROJECT_DIR$/openTCS-Server/ruoyi-common/pom.xml" />
+        <option value="$PROJECT_DIR$/openTCS-Server/ruoyi-framework/pom.xml" />
+        <option value="$PROJECT_DIR$/openTCS-Server/ruoyi-generator/pom.xml" />
+        <option value="$PROJECT_DIR$/openTCS-Server/ruoyi-quartz/pom.xml" />
       </list>
     </option>
   </component>

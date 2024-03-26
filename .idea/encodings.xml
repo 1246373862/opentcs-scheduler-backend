@@ -1,6 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="Encoding">
+    <file url="file://$PROJECT_DIR$/openTCS-Server/ruoyi-admin/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/openTCS-Server/ruoyi-admin/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/openTCS-Server/ruoyi-common/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/openTCS-Server/ruoyi-common/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/openTCS-Server/ruoyi-framework/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/openTCS-Server/ruoyi-framework/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/openTCS-Server/ruoyi-generator/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/openTCS-Server/ruoyi-generator/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/openTCS-Server/ruoyi-quartz/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/openTCS-Server/ruoyi-quartz/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/openTCS-Server/ruoyi-system/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/openTCS-Server/ruoyi-system/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/openTCS-Server/server-admin/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/openTCS-Server/server-admin/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/openTCS-Server/server-common/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/openTCS-Server/server-common/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/openTCS-Server/server-framework/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/openTCS-Server/server-framework/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/openTCS-Server/server-generator/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/openTCS-Server/server-generator/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/openTCS-Server/server-quartz/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/openTCS-Server/server-quartz/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/openTCS-Server/server-system/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/openTCS-Server/server-system/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/openTCS-Server/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/openTCS-Server/src/main/resources" charset="UTF-8" />
   </component>
