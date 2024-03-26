@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="GradleMigrationSettings" migrationVersion="1" />
+  <component name="GradleSettings">
+    <option name="linkedExternalProjectsSettings">
+      <GradleProjectSettings>
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="gradleJvm" value="#JAVA_HOME" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/openTCS-API-Base" />
+            <option value="$PROJECT_DIR$/openTCS-API-Injection" />
+            <option value="$PROJECT_DIR$/openTCS-CommAdapter-Loopback" />
+            <option value="$PROJECT_DIR$/openTCS-Common" />
+            <option value="$PROJECT_DIR$/openTCS-Documentation" />
+            <option value="$PROJECT_DIR$/openTCS-Impl-Configuration-cfg4j" />
+            <option value="$PROJECT_DIR$/openTCS-Kernel" />
+            <option value="$PROJECT_DIR$/openTCS-Kernel-Extension-HTTP-Services" />
+            <option value="$PROJECT_DIR$/openTCS-Kernel-Extension-RMI-Services" />
+            <option value="$PROJECT_DIR$/openTCS-KernelControlCenter" />
+            <option value="$PROJECT_DIR$/openTCS-ModelEditor" />
+            <option value="$PROJECT_DIR$/openTCS-OperationsDesk" />
+            <option value="$PROJECT_DIR$/openTCS-PeripheralCommAdapter-Loopback" />
+            <option value="$PROJECT_DIR$/openTCS-PlantOverview-Base" />
+            <option value="$PROJECT_DIR$/openTCS-PlantOverview-Common" />
+            <option value="$PROJECT_DIR$/openTCS-PlantOverview-Panel-LoadGenerator" />
+            <option value="$PROJECT_DIR$/openTCS-PlantOverview-Panel-ResourceAllocation" />
+            <option value="$PROJECT_DIR$/openTCS-PlantOverview-Themes-Default" />
+            <option value="$PROJECT_DIR$/openTCS-Strategies-Default" />
+          </set>
+        </option>
+      </GradleProjectSettings>
+    </option>
+  </component>
+</project>
