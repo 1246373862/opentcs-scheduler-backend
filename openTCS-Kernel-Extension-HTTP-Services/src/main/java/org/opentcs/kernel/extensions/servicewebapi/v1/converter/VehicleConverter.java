@@ -24,7 +24,7 @@ import org.opentcs.util.Colors;
 public class VehicleConverter {
 
   private final PropertyConverter pConverter;
-  
+
   @Inject
   public VehicleConverter(PropertyConverter pConverter) {
     this.pConverter=requireNonNull(pConverter, "pConverter");

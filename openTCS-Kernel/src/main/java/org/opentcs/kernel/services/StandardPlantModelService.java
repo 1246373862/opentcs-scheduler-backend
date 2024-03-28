@@ -105,7 +105,7 @@ public class StandardPlantModelService
   public Set<TCSResource<?>> expandResources(Set<TCSResourceReference<?>> resources)
       throws ObjectUnknownException {
     requireNonNull(resources, "resources");
-    
+
     synchronized (globalSyncObject) {
       return plantModelManager.expandResources(resources);
     }
@@ -211,7 +211,7 @@ public class StandardPlantModelService
   public void updateLocationLock(TCSObjectReference<Location> ref, boolean locked)
       throws ObjectUnknownException {
     requireNonNull(ref, "ref");
-    
+
     synchronized (globalSyncObject) {
       plantModelManager.setLocationLocked(ref, locked);
     }
@@ -222,7 +222,7 @@ public class StandardPlantModelService
   public void updateLocationReservationToken(TCSObjectReference<Location> ref, String token)
       throws ObjectUnknownException, KernelRuntimeException {
     requireNonNull(ref, "ref");
-    
+
     synchronized (globalSyncObject) {
       plantModelManager.setLocationReservationToken(ref, token);
     }

@@ -139,7 +139,7 @@ public class NullVehicleController
     LOG.warn("No comm adapter attached to vehicle {}", vehicleName);
     return null;
   }
-  
+
   @Override
   public boolean allocationSuccessful(Set<TCSResource<?>> resources) {
     LOG.warn("No comm adapter attached to vehicle {}", vehicleName);

@@ -30,23 +30,16 @@ import org.opentcs.access.to.model.VehicleCreationTO;
 import org.opentcs.access.to.model.VisualLayoutCreationTO;
 import org.opentcs.access.to.peripherals.PeripheralOperationCreationTO;
 import org.opentcs.customizations.ApplicationEventBus;
+import org.opentcs.data.model.*;
 import org.opentcs.data.ObjectExistsException;
 import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.data.TCSObject;
 import org.opentcs.data.TCSObjectEvent;
 import org.opentcs.data.TCSObjectReference;
-import org.opentcs.data.model.Block;
-import org.opentcs.data.model.Couple;
-import org.opentcs.data.model.Location;
-import org.opentcs.data.model.LocationType;
 import org.opentcs.data.model.Path;
 import org.opentcs.data.model.PeripheralInformation;
 import org.opentcs.data.model.Point;
-import org.opentcs.data.model.Pose;
-import org.opentcs.data.model.TCSResource;
 import org.opentcs.data.model.TCSResourceReference;
-import org.opentcs.data.model.Triple;
-import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.model.visualization.ElementPropKeys;
 import org.opentcs.data.model.visualization.VisualLayout;
 import org.opentcs.data.order.OrderSequence;
@@ -141,7 +134,7 @@ public class PlantModelManager
     List<TCSObject<?>> objects = new ArrayList<>();
     objects.addAll(getObjectRepo().getObjects(VisualLayout.class));
     objects.addAll(getObjectRepo().getObjects(Vehicle.class));
-    objects.addAll(getObjectRepo().getObjects(org.opentcs.data.model.Group.class));
+    objects.addAll(getObjectRepo().getObjects(Group.class));
     objects.addAll(getObjectRepo().getObjects(Block.class));
     objects.addAll(getObjectRepo().getObjects(Path.class));
     objects.addAll(getObjectRepo().getObjects(Location.class));
@@ -1064,11 +1057,11 @@ public class PlantModelManager
    */
   @Deprecated
   private List<org.opentcs.access.to.model.GroupCreationTO> getGroups() {
-    Set<org.opentcs.data.model.Group> groups
-        = getObjectRepo().getObjects(org.opentcs.data.model.Group.class);
+    Set<Group> groups
+        = getObjectRepo().getObjects(Group.class);
     List<org.opentcs.access.to.model.GroupCreationTO> result = new ArrayList<>();
 
-    for (org.opentcs.data.model.Group curGroup : groups) {
+    for (Group curGroup : groups) {
       result.add(
           new org.opentcs.access.to.model.GroupCreationTO(curGroup.getName())
               .withMemberNames(curGroup.getMembers().stream()
@@ -1338,13 +1331,13 @@ public class PlantModelManager
    * @throws ObjectUnknownException If any object referenced in the TO does not exist.
    */
   @Deprecated
-  private org.opentcs.data.model.Group createGroup(org.opentcs.access.to.model.GroupCreationTO to)
+  private Group createGroup(org.opentcs.access.to.model.GroupCreationTO to)
       throws ObjectExistsException, ObjectUnknownException {
     Set<TCSObjectReference<?>> members = new HashSet<>();
     for (String memberName : to.getMemberNames()) {
       members.add(getObjectRepo().getObject(memberName).getReference());
     }
-    org.opentcs.data.model.Group newGroup = new org.opentcs.data.model.Group(to.getName())
+    Group newGroup = new Group(to.getName())
         .withMembers(members)
         .withProperties(to.getProperties());
     getObjectRepo().addObject(newGroup);

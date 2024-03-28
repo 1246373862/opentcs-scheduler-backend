@@ -12,6 +12,7 @@
         <option value="$PROJECT_DIR$/openTCS-Server/ruoyi-framework/pom.xml" />
         <option value="$PROJECT_DIR$/openTCS-Server/ruoyi-generator/pom.xml" />
         <option value="$PROJECT_DIR$/openTCS-Server/ruoyi-quartz/pom.xml" />
+        <option value="$PROJECT_DIR$/openTCS-Server/server-api/pom.xml" />
       </list>
     </option>
   </component>

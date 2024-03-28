@@ -34,8 +34,6 @@ import org.opentcs.components.plantoverview.LocationTheme;
 import org.opentcs.data.model.TCSResourceReference;
 import org.opentcs.data.model.visualization.LocationRepresentation;
 import org.opentcs.guing.base.AllocationState;
-import static org.opentcs.guing.base.AllocationState.ALLOCATED;
-import static org.opentcs.guing.base.AllocationState.CLAIMED;
 import org.opentcs.guing.base.components.properties.event.AttributesChangeEvent;
 import org.opentcs.guing.base.components.properties.type.SymbolProperty;
 import org.opentcs.guing.base.model.elements.BlockModel;

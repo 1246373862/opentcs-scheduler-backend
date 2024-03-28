@@ -488,7 +488,7 @@ public class VehicleModel
   public StringProperty getPropertyEnvelopeKey() {
     return (StringProperty) getProperty(ENVELOPE_KEY);
   }
-  
+
   public KeyValueSetProperty getPropertyMiscellaneous() {
     return (KeyValueSetProperty) getProperty(MISCELLANEOUS);
   }
@@ -675,7 +675,7 @@ public class VehicleModel
     pEnvelopeKey.setModellingEditable(true);
     pEnvelopeKey.setOperatingEditable(false);
     setProperty(ENVELOPE_KEY, pEnvelopeKey);
-    
+
     KeyValueSetProperty pMiscellaneous = new KeyValueSetProperty(this);
     pMiscellaneous.setDescription(
         bundle.getString("vehicleModel.property_miscellaneous.description")

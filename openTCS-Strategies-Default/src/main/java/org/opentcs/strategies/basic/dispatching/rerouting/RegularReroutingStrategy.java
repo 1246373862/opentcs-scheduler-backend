@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
  * The {@link ReroutingStrategy} implementation for {@link ReroutingType#REGULAR}.
  * <p>
  * Reroutes a {@link Vehicle} from its future or current position according to
- * {@link VehiclePositionResolver#getFutureOrCurrentPosition(org.opentcs.data.model.Vehicle)}.
+ * {@link VehiclePositionResolver#getFutureOrCurrentPosition(Vehicle)}.
  */
 public class RegularReroutingStrategy
     extends AbstractReroutingStrategy

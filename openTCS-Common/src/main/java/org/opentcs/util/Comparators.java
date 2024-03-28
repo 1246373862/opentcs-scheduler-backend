@@ -8,6 +8,7 @@
 package org.opentcs.util;
 
 import java.util.Comparator;
+import org.opentcs.data.model.visualization.ModelLayoutElement;
 import org.opentcs.data.TCSObject;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.order.TransportOrder;
@@ -84,10 +85,10 @@ public final class Comparators {
    */
   @Deprecated
   @ScheduledApiChange(details = "Will be removed.", when = "6.0")
-  public static Comparator<org.opentcs.data.model.visualization.ModelLayoutElement>
+  public static Comparator<ModelLayoutElement>
       modelLayoutElementsByName() {
-    return (org.opentcs.data.model.visualization.ModelLayoutElement o1,
-        org.opentcs.data.model.visualization.ModelLayoutElement o2)
+    return (ModelLayoutElement o1,
+            ModelLayoutElement o2)
         -> o1.getVisualizedObject().getName().compareTo(
             o2.getVisualizedObject().getName());
   }

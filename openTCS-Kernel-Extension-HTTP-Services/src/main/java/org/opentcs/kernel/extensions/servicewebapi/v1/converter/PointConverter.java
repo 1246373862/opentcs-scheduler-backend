@@ -29,7 +29,7 @@ public class PointConverter {
 
   private final PropertyConverter pConverter;
   private final EnvelopeConverter envelopeConverter;
-  
+
   @Inject
   public PointConverter(PropertyConverter pConverter,EnvelopeConverter envelopeConverter) {
     this.pConverter=requireNonNull(pConverter, "pConverter");

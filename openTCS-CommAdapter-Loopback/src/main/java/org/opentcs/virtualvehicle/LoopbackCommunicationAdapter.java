@@ -207,7 +207,7 @@ public class LoopbackCommunicationAdapter
     // simulation).
     return !isSimulationRunning && super.canSendNextCommand();
   }
-  
+
   @Override
   public void onVehiclePaused(boolean paused) {
     getProcessModel().setVehiclePaused(paused);

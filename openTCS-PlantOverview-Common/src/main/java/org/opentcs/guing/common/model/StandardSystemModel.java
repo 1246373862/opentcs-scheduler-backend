@@ -25,8 +25,6 @@ import org.opentcs.guing.base.components.properties.type.KeyValueSetProperty;
 import org.opentcs.guing.base.components.properties.type.StringProperty;
 import org.opentcs.guing.base.model.CompositeModelComponent;
 import org.opentcs.guing.base.model.ModelComponent;
-import static org.opentcs.guing.base.model.ModelComponent.MISCELLANEOUS;
-import static org.opentcs.guing.base.model.ModelComponent.NAME;
 import org.opentcs.guing.base.model.SimpleFolder;
 import org.opentcs.guing.base.model.elements.BlockModel;
 import org.opentcs.guing.base.model.elements.LayoutModel;

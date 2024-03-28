@@ -26,7 +26,7 @@ import org.opentcs.kernel.extensions.servicewebapi.v1.binding.plantmodel.VisualL
 public class VisualLayoutConverter {
 
   private final PropertyConverter pConverter;
-  
+
   @Inject
   public VisualLayoutConverter(PropertyConverter pConverter) {
     this.pConverter=requireNonNull(pConverter, "pConverter");

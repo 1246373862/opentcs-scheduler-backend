@@ -12,9 +12,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import static java.util.Objects.requireNonNull;
+import org.opentcs.data.model.visualization.LocationRepresentation;
 import org.opentcs.data.ObjectHistory;
 import org.opentcs.data.TCSObject;
-import org.opentcs.data.model.visualization.LocationRepresentation;
 
 /**
  * Describes the type of a {@link Location}.

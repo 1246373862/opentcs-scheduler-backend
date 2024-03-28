@@ -27,7 +27,7 @@ public class PathConverter {
   private final PropertyConverter pConverter;
   private final PeripheralOperationConverter pOConverter;
   private final EnvelopeConverter envelopeConverter;
-  
+
   @Inject
   public PathConverter(PropertyConverter pConverter,PeripheralOperationConverter pOConverter,
                                                     EnvelopeConverter envelopeConverter) {

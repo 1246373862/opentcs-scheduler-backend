@@ -32,13 +32,13 @@ import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.PropertyTO;
  * Tests for {@link VisualLayoutConverter}.
  */
 public class VisualLayoutConverterTest {
-  
+
   private VisualLayoutConverter visualLayoutConverter;
   private PropertyConverter propertyConverter;
 
   private Map<String, String> propertyMap;
   private List<PropertyTO> propertyList;
-  
+
   @BeforeEach
   public void setUp() {
     propertyConverter = mock();
@@ -49,7 +49,7 @@ public class VisualLayoutConverterTest {
     when(propertyConverter.toPropertyTOs(propertyMap)).thenReturn(propertyList);
     when(propertyConverter.toPropertyMap(propertyList)).thenReturn(propertyMap);
   }
-  
+
   @Test
   public void checkToVisualLayoutCreationTO() {
     VisualLayoutTO vLayout = new VisualLayoutTO("V1")
@@ -58,9 +58,9 @@ public class VisualLayoutConverterTest {
         .setLayers(List.of(new LayerTO(1, 2, true, "L1", 3)))
         .setLayerGroups(List.of(new LayerGroupTO(1, "Lg1", true)))
         .setProperties(propertyList);
-    
+
     VisualLayoutCreationTO result = visualLayoutConverter.toVisualLayoutCreationTO(vLayout);
-    
+
     assertThat(result.getName(), is("V1"));
     assertThat(result.getScaleX(), is(50.0));
     assertThat(result.getScaleY(), is(50.0));
@@ -72,7 +72,7 @@ public class VisualLayoutConverterTest {
     assertThat(result.getProperties(), is(aMapWithSize(1)));
     assertThat(result.getProperties(), is(propertyMap));
   }
-  
+
   @Test
   public void checkVisualLayoutTO() {
     VisualLayout vLayout = new VisualLayout("V1")
@@ -81,9 +81,9 @@ public class VisualLayoutConverterTest {
         .withLayers(List.of(new Layer(1, 2, true, "L1", 3)))
         .withLayerGroups(List.of(new LayerGroup(3, "G1", true)))
         .withProperties(propertyMap);
-    
+
     VisualLayoutTO result = visualLayoutConverter.toVisualLayoutTO(Set.of(vLayout));
-    
+
     assertThat(result.getName(), is("V1"));
     assertThat(result.getScaleX(), is(50.00));
     assertThat(result.getScaleY(), is(50.00));
@@ -94,11 +94,11 @@ public class VisualLayoutConverterTest {
                samePropertyValuesAs(new LayerGroupTO(3, "G1", true)));
     assertThat(result.getProperties(), is(propertyList));
   }
-  
+
   @Test
   public void checkToVisualLayoutTOShouldCreateDefault() {
     VisualLayoutTO result = visualLayoutConverter.toVisualLayoutTO(Set.of());
-    
+
     assertThat(result.getName(), is("default visual layout"));
   }
 }

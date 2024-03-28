@@ -129,7 +129,7 @@ public class PointCreationTO
    *
    * @param position The new position.
    * @return A copy of this object, differing in the given position.
-   * @deprecated Use {@link #withPose(org.opentcs.data.model.Pose)} instead.
+   * @deprecated Use {@link #withPose(Pose)} instead.
    */
   @Deprecated
   @ScheduledApiChange(when = "6.0", details = "Will be removed.")
@@ -163,7 +163,7 @@ public class PointCreationTO
    *
    * @param vehicleOrientationAngle The new angle.
    * @return A copy of this object, differing in the given angle.
-   * @deprecated Use {@link #withPose(org.opentcs.data.model.Pose)} instead.
+   * @deprecated Use {@link #withPose(Pose)} instead.
    */
   @Deprecated
   @ScheduledApiChange(when = "6.0", details = "Will be removed.")

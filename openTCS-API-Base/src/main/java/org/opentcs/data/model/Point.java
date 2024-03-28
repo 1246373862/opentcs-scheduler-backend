@@ -205,7 +205,7 @@ public class Point
    *
    * @param position The value to be set in the copy.
    * @return A copy of this object, differing in the given value.
-   * @deprecated Use {@link #withPose(org.opentcs.data.model.Pose)} instead.
+   * @deprecated Use {@link #withPose(Pose)} instead.
    */
   @Deprecated
   @ScheduledApiChange(when = "6.0", details = "Will be removed.")
@@ -242,7 +242,7 @@ public class Point
    *
    * @param vehicleOrientationAngle The value to be set in the copy.
    * @return A copy of this object, differing in the given value.
-   * @deprecated Use {@link #withPose(org.opentcs.data.model.Pose)} instead.
+   * @deprecated Use {@link #withPose(Pose)} instead.
    */
   @Deprecated
   @ScheduledApiChange(when = "6.0", details = "Will be removed.")

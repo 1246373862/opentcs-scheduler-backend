@@ -24,7 +24,7 @@ import org.opentcs.kernel.extensions.servicewebapi.v1.binding.plantmodel.Locatio
 public class LocationTypeConverter {
 
   private final PropertyConverter pConverter;
-  
+
   @Inject
   public LocationTypeConverter(PropertyConverter pConverter) {
     this.pConverter=requireNonNull(pConverter, "pConverter");

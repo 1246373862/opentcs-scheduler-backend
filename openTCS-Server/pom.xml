@@ -27,6 +27,7 @@
     <poi.version>4.1.2</poi.version>
     <velocity.version>2.3</velocity.version>
     <jwt.version>0.9.1</jwt.version>
+    <opentcs.version>5.11.0</opentcs.version>
   </properties>
 
   <!-- 依赖声明 -->
@@ -159,17 +160,43 @@
         <artifactId>server-common</artifactId>
         <version>${server.version}</version>
       </dependency>
-
+      <dependency>
+        <groupId>org.opentcs</groupId>
+        <artifactId>opentcs-common</artifactId>
+        <version>${opentcs.version}</version>
+      </dependency>
+      <!-- https://mvnrepository.com/artifact/org.opentcs/opentcs-api-injection -->
+      <dependency>
+        <groupId>org.opentcs</groupId>
+        <artifactId>opentcs-api-injection</artifactId>
+        <version>${opentcs.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.opentcs</groupId>
+        <artifactId>opentcs-api-base</artifactId>
+        <version>${opentcs.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.opentcs</groupId>
+        <artifactId>opentcs-kernel</artifactId>
+        <version>${opentcs.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.opentcs</groupId>
+        <artifactId>opentcs-kernel-extension-http-services</artifactId>
+        <version>${opentcs.version}</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
 
   <modules>
-    <module>server-admin</module>
+    <module>server-api</module>
     <module>server-framework</module>
     <module>server-system</module>
     <module>server-quartz</module>
     <module>server-generator</module>
     <module>server-common</module>
+    <module>server-api</module>
   </modules>
   <packaging>pom</packaging>
 
@@ -190,12 +217,15 @@
 
   <repositories>
     <repository>
-      <id>public</id>
-      <name>aliyun nexus</name>
-      <url>https://maven.aliyun.com/repository/public</url>
+      <id>nexus-aliyun</id>
+      <name>local private nexus</name>
+      <url>http://maven.aliyun.com/nexus/content/groups/public/</url>
       <releases>
         <enabled>true</enabled>
       </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
     </repository>
   </repositories>
 

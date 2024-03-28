@@ -418,7 +418,7 @@ public class DefaultScheduler
     public TCSObjectReference<Vehicle> getRelatedVehicle() {
       return null;
     }
-    
+
     @Override
     public boolean allocationSuccessful(Set<TCSResource<?>> resources) {
       return false;

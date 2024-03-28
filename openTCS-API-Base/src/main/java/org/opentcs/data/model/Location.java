@@ -15,10 +15,10 @@ import static java.util.Objects.requireNonNull;
 import java.util.Set;
 import java.util.TreeSet;
 import javax.annotation.Nonnull;
+import org.opentcs.data.model.visualization.LocationRepresentation;
 import org.opentcs.data.ObjectHistory;
 import org.opentcs.data.TCSObject;
 import org.opentcs.data.TCSObjectReference;
-import org.opentcs.data.model.visualization.LocationRepresentation;
 
 /**
  * A location at which a {@link Vehicle} may perform an action.

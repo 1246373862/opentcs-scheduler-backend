@@ -98,7 +98,7 @@ public class VehicleAdapter
       model.setVehicle(vehicle);
 
       model.getPropertyEnvelopeKey().setText(vehicle.getEnvelopeKey());
-      
+
       updateMiscModelProperties(model, vehicle);
       updateModelDriveOrder(objectService, vehicle, model, systemModel);
       updateModelLayoutProperties(model, vehicle);
@@ -231,7 +231,7 @@ public class VehicleAdapter
   private int getEnergyLevelSufficientlyRecharged(VehicleModel model) {
     return (Integer) model.getPropertyEnergyLevelSufficientlyRecharged().getValue();
   }
-  
+
   private String getEnvelopeKey(VehicleModel model) {
     return model.getPropertyEnvelopeKey().getText();
   }

@@ -30,8 +30,6 @@ import org.opentcs.drivers.vehicle.VehicleController;
 import org.opentcs.drivers.vehicle.VehicleControllerPool;
 import org.opentcs.strategies.basic.dispatching.DefaultDispatcherConfiguration.ReroutingImpossibleStrategy;
 import static org.opentcs.strategies.basic.dispatching.DefaultDispatcherConfiguration.ReroutingImpossibleStrategy.IGNORE_PATH_LOCKS;
-import static org.opentcs.strategies.basic.dispatching.DefaultDispatcherConfiguration.ReroutingImpossibleStrategy.PAUSE_AT_PATH_LOCK;
-import static org.opentcs.strategies.basic.dispatching.DefaultDispatcherConfiguration.ReroutingImpossibleStrategy.PAUSE_IMMEDIATELY;
 import org.opentcs.strategies.basic.dispatching.rerouting.ReroutingStrategy;
 import org.opentcs.strategies.basic.dispatching.rerouting.VehiclePositionResolver;
 import org.slf4j.Logger;

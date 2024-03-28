@@ -30,7 +30,7 @@ import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.TripleTO;
 public class LocationConverter {
 
   private final PropertyConverter pConverter;
-  
+
   @Inject
   public LocationConverter(PropertyConverter pConverter) {
     this.pConverter=requireNonNull(pConverter, "pConverter");
