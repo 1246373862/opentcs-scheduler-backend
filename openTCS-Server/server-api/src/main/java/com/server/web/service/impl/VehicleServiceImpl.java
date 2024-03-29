@@ -28,9 +28,15 @@ public class VehicleServiceImpl
     }
     else if (vehiclesQueryDTO.getName() != null) {
       List<VehiclesInfoVO> vehiclesInfoVOS = new ArrayList<>();
-      VehiclesInfoVO vehiclesInfoVO = JSON.parseObject(HttpUtils.sendGet("http://localhost:55200/v1/vehicles/" + vehiclesQueryDTO.getName()), VehiclesInfoVO.class);
-      vehiclesInfoVOS.add(vehiclesInfoVO);
-      return process(vehiclesInfoVOS);
+      try {
+        VehiclesInfoVO vehiclesInfoVO = JSON.parseObject(HttpUtils.sendGet("http://localhost:55200/v1/vehicles/" + vehiclesQueryDTO.getName()), VehiclesInfoVO.class);
+        vehiclesInfoVOS.add(vehiclesInfoVO);
+        return process(vehiclesInfoVOS);
+      }
+      catch (NullPointerException e) {
+        return new ArrayList<>();
+      }
+
     }
     else if (vehiclesQueryDTO.getProcStatus() != null) {
       VehicleProcStatusEnum vehicleProcStatusEnum = VehicleProcStatusEnum.getVehicleProcStatusEnumByCode(vehiclesQueryDTO.getProcStatus());
