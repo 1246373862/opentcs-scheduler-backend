@@ -12,6 +12,7 @@ dependencies {
   api group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.15.3'
   api group: 'com.fasterxml.jackson.module', name: 'jackson-module-jsonSchema', version: '2.15.3'
   api group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.15.3'
+  api group: 'redis.clients', name: 'jedis', version: '2.9.0'
 }
 
 task release {

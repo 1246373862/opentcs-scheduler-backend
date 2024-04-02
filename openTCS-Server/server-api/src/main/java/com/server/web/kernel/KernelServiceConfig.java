@@ -7,13 +7,11 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-@Component
-public class KernelServiceConfig {
-  private static KernelServicePortal kernelServicePortal;
 
-  @Bean
-  @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON) // 设置为单例
-  public KernelServicePortal kernelServicePortal() {
+public class KernelServiceConfig {
+  private static KernelServicePortal kernelServicePortal = null;
+
+  public static KernelServicePortal getKernelServicePortal() {
     if (kernelServicePortal == null) {
       // 在此处配置连接参数，例如用户名、密码等
       kernelServicePortal = new KernelServicePortalBuilder("Alice", "xyz").build();

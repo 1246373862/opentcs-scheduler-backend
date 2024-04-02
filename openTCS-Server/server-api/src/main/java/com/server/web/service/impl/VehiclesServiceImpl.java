@@ -4,16 +4,34 @@ import com.alibaba.fastjson2.JSON;
 import com.server.common.utils.http.HttpUtils;
 import com.server.web.common.enums.VehicleProcStatusEnum;
 import com.server.web.common.enums.VehicleStatusEnum;
+import com.server.web.kernel.KernelServiceConfig;
+import com.server.web.model.dto.VehicleInitDTO;
+import com.server.web.model.dto.VehiclePausedDTO;
 import com.server.web.model.dto.VehiclesQueryDTO;
+import com.server.web.model.vo.OrdersVO;
 import com.server.web.model.vo.VehiclesInfoVO;
-import com.server.web.service.VehicleService;
+import com.server.web.service.VehiclesService;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+
+import org.opentcs.access.KernelServicePortal;
+import org.opentcs.components.kernel.services.VehicleService;
+import org.opentcs.data.model.Vehicle;
+import org.opentcs.data.order.TransportOrder;
+import org.opentcs.virtualvehicle.commands.SetPositionCommand;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
+
 @Service
-public class VehicleServiceImpl
-    implements VehicleService {
+public class VehiclesServiceImpl
+    implements VehiclesService {
+
+private static final KernelServicePortal kernelServicePortal = KernelServiceConfig.getKernelServicePortal();
+
+private static final VehicleService vehiclesService = kernelServicePortal.getVehicleService();
   @Override
   public List<VehiclesInfoVO> page(VehiclesQueryDTO vehiclesQueryDTO) {
     if (vehiclesQueryDTO.getName() != null && vehiclesQueryDTO.getProcStatus() != null) {
@@ -46,6 +64,20 @@ public class VehicleServiceImpl
       return getALL();
     }
 
+  }
+
+  @Override
+  public void initVehicle(VehicleInitDTO vehiclesQueryDTO) {
+      //获取车辆实例
+      Vehicle vehicle = vehiclesService.fetchObject(Vehicle.class,vehiclesQueryDTO.getName());
+      vehiclesService.enableCommAdapter(vehicle.getReference());
+      vehiclesService.sendCommAdapterCommand(vehicle.getReference(),new SetPositionCommand(vehiclesQueryDTO.getPoint()));
+  }
+
+  @Override
+  public void paused(VehiclePausedDTO vehiclePausedDTO) {
+    Vehicle vehicle = vehiclesService.fetchObject(Vehicle.class,vehiclePausedDTO.getName());
+    vehiclesService.updateVehiclePaused(vehicle.getReference(),vehiclePausedDTO.isPaused());
   }
 
   private List<VehiclesInfoVO> process(List<VehiclesInfoVO> list) {

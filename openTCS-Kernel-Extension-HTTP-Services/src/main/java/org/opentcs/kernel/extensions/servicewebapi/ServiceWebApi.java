@@ -16,9 +16,12 @@ import org.opentcs.access.SslParameterSet;
 import org.opentcs.components.kernel.KernelExtension;
 import org.opentcs.data.ObjectExistsException;
 import org.opentcs.data.ObjectUnknownException;
+import org.opentcs.data.TCSObjectEvent;
 import org.opentcs.kernel.extensions.servicewebapi.v1.V1RequestHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import redis.clients.jedis.Jedis;
+import redis.clients.jedis.exceptions.JedisConnectionException;
 import spark.Service;
 
 /**
@@ -86,6 +89,19 @@ public class ServiceWebApi
   public void initialize() {
     if (isInitialized()) {
       return;
+    }
+    Jedis jedis = new Jedis("127.0.0.1", 6379);
+    LOG.debug("can not connect redis");
+    try {
+      jedis.connect();
+      LOG.info("redis 连接成功");
+    }
+    catch (JedisConnectionException e) {
+      LOG.error("redis connection exception:{}", e.getMessage());
+    }
+    //check
+    if (!jedis.isConnected()) {
+      LOG.error("can not connect to redis:{}", "127.0.0.1");
     }
 
     v1RequestHandler.initialize();
@@ -170,6 +186,7 @@ public class ServiceWebApi
     if (!isInitialized()) {
       return;
     }
+
 
     v1RequestHandler.terminate();
     service.stop();
