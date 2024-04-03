@@ -11,10 +11,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import javax.annotation.Resource;
 import org.opentcs.access.KernelServicePortal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @Api(value = "车辆管理相关接口", tags = "车辆管理相关接口")
@@ -34,7 +31,7 @@ private VehiclesService vehiclesService;
 
   @ApiOperation("开启适配器使能和初始化位置")
   @PostMapping("/init")
-  public AjaxResult initVehicle(VehicleInitDTO vehiclesQueryDTO) {
+  public AjaxResult initVehicle(@RequestBody VehicleInitDTO vehiclesQueryDTO) {
     vehiclesService.initVehicle(vehiclesQueryDTO);
     return AjaxResult.success();
   }
@@ -42,7 +39,7 @@ private VehiclesService vehiclesService;
 
   @ApiOperation("恢复或暂停车辆")
   @PostMapping("/paused")
-  public AjaxResult paused(VehiclePausedDTO vehiclePausedDTO) {
+  public AjaxResult paused(@RequestBody VehiclePausedDTO vehiclePausedDTO) {
     vehiclesService.paused(vehiclePausedDTO);
     return AjaxResult.success();
   }
