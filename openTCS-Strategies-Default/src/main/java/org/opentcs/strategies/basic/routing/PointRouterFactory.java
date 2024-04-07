@@ -7,7 +7,10 @@
  */
 package org.opentcs.strategies.basic.routing;
 
+import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
+
+import java.util.Collection;
 
 /**
  * Implementations of this interface construct point routers.
@@ -21,4 +24,6 @@ public interface PointRouterFactory {
    * @return The point router.
    */
   PointRouter createPointRouter(Vehicle vehicle);
+  PointRouter createMyPointRouter(Vehicle vehicle, Collection<Point> unusablePoints);
+
 }

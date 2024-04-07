@@ -1,24 +1,19 @@
 /**
  * Copyright (c) The openTCS Authors.
- *
+ * <p>
  * This program is free software and subject to the MIT license. (For details,
  * see the licensing information (LICENSE.txt) you should have received with
  * this copy of the software.)
  */
 package org.opentcs.strategies.basic.routing;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
+
 import static java.util.Objects.requireNonNull;
-import java.util.Optional;
-import java.util.Set;
+
 import java.util.concurrent.ConcurrentHashMap;
 import javax.inject.Inject;
+
 import org.opentcs.components.kernel.Router;
 import org.opentcs.components.kernel.routing.GroupMapper;
 import org.opentcs.components.kernel.services.TCSObjectService;
@@ -31,7 +26,9 @@ import org.opentcs.data.order.DriveOrder;
 import org.opentcs.data.order.DriveOrder.Destination;
 import org.opentcs.data.order.Route;
 import org.opentcs.data.order.TransportOrder;
+
 import static org.opentcs.strategies.basic.routing.PointRouter.INFINITE_COSTS;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -77,10 +74,10 @@ public class DefaultRouter
   /**
    * Creates a new instance.
    *
-   * @param objectService The object service providing the model data.
+   * @param objectService      The object service providing the model data.
    * @param pointRouterFactory A factory for point routers.
    * @param routingGroupMapper Used to map vehicles to their routing groups.
-   * @param configuration This class's configuration.
+   * @param configuration      This class's configuration.
    */
   @Inject
   public DefaultRouter(TCSObjectService objectService,
@@ -171,7 +168,9 @@ public class DefaultRouter
     synchronized (this) {
       List<DriveOrder> driveOrderList = transportOrder.getFutureDriveOrders();
       DriveOrder[] driveOrders = driveOrderList.toArray(new DriveOrder[driveOrderList.size()]);
-      PointRouter pointRouter = getPointRouterForVehicle(vehicle);
+      // todo
+//      PointRouter pointRouter = getPointRouterForVehicle(vehicle);
+      PointRouter pointRouter = getActualPointRouter(sourcePoint,vehicle);
       OrderRouteParameterStruct params = new OrderRouteParameterStruct(driveOrders, pointRouter);
       OrderRouteResultStruct resultStruct = new OrderRouteResultStruct(driveOrderList.size());
       computeCheapestOrderRoute(sourcePoint, params, 0, resultStruct);
@@ -190,7 +189,9 @@ public class DefaultRouter
     requireNonNull(destinationPoint, "destinationPoint");
 
     synchronized (this) {
-      PointRouter pointRouter = getPointRouterForVehicle(vehicle);
+      // todo
+      PointRouter pointRouter = getActualPointRouter(sourcePoint,vehicle);
+//      PointRouter pointRouter = getPointRouterForVehicle(vehicle);
       long costs = pointRouter.getCosts(sourcePoint, destinationPoint);
       if (costs == INFINITE_COSTS) {
         return Optional.empty();
@@ -239,8 +240,7 @@ public class DefaultRouter
       if (driveOrders == null) {
         // XXX Should we remember the vehicle's current position, maybe?
         routesByVehicle.remove(vehicle);
-      }
-      else {
+      } else {
         routesByVehicle.put(vehicle, driveOrders);
       }
     }
@@ -285,7 +285,7 @@ public class DefaultRouter
     String routingGroup = routingGroupMapper.apply(vehicle);
     if (!pointRoutersByVehicleGroup.containsKey(routingGroup)) {
       pointRoutersByVehicleGroup.put(routingGroup,
-                                     pointRouterFactory.createPointRouter(vehicle));
+          pointRouterFactory.createPointRouter(vehicle));
     }
 
     return pointRoutersByVehicleGroup.get(routingGroup);
@@ -295,11 +295,11 @@ public class DefaultRouter
    * Checks if a route exists for a vehicle of a given type which allows the
    * vehicle to process a given list of drive orders.
    *
-   * @param startPoint The point at which the route is supposed to start.
-   * @param driveOrders The list of drive orders, in the order they are to be
-   * processed.
+   * @param startPoint   The point at which the route is supposed to start.
+   * @param driveOrders  The list of drive orders, in the order they are to be
+   *                     processed.
    * @param nextHopIndex The index of the next drive order in the list.
-   * @param pointRouter The point router to use.
+   * @param pointRouter  The point router to use.
    * @return <code>true</code> if, and only if, at least one route exists which
    * would allow a vehicle of the given type to process the whole list of drive
    * orders.
@@ -336,9 +336,9 @@ public class DefaultRouter
    * Compute the cheapest route along a list of drive orders/checkpoints.
    *
    * @param startPoint The current checkpoint which to start at.
-   * @param params A struct describing parameters for the route to be computed.
-   * @param hopIndex The current index in the list of drive orders/checkpoints.
-   * @param result A struct for keeping the (partial) result in.
+   * @param params     A struct describing parameters for the route to be computed.
+   * @param hopIndex   The current index in the list of drive orders/checkpoints.
+   * @param result     A struct for keeping the (partial) result in.
    */
   private void computeCheapestOrderRoute(Point startPoint,
                                          OrderRouteParameterStruct params,
@@ -374,10 +374,10 @@ public class DefaultRouter
           // without a path.
           steps = new ArrayList<>(1);
           steps.add(new Route.Step(null,
-                                   null,
-                                   startPoint,
-                                   Vehicle.Orientation.UNDEFINED,
-                                   0));
+              null,
+              startPoint,
+              Vehicle.Orientation.UNDEFINED,
+              0));
         }
         // Create a route from the list of steps gathered.
         Route hopRoute = new Route(steps, hopCosts);
@@ -399,11 +399,11 @@ public class DefaultRouter
     }
     // If we have reached the final drive order, ...
     else // If the route computed is cheaper than the best route found so far,
-    // replace the latter.
-    if (result.currentCosts < result.bestCosts) {
-      System.arraycopy(result.currentRoute, 0, result.bestRoute, 0, result.currentRoute.length);
-      result.bestCosts = result.currentCosts;
-    }
+      // replace the latter.
+      if (result.currentCosts < result.bestCosts) {
+        System.arraycopy(result.currentRoute, 0, result.bestRoute, 0, result.currentRoute.length);
+        result.bestCosts = result.currentCosts;
+      }
   }
 
   /**
@@ -423,7 +423,7 @@ public class DefaultRouter
     // selected point - return an appropriate set with only that point.
     if (dest.getDestination().getReferentClass() == Point.class
         && (Destination.OP_MOVE.equals(dest.getOperation())
-            || Destination.OP_PARK.equals(dest.getOperation()))) {
+        || Destination.OP_PARK.equals(dest.getOperation()))) {
       // Route the vehicle to an user selected point if halting is allowed there.
       Point destPoint = objectService.fetchObject(Point.class, dest.getDestination().getName());
       requireNonNull(destPoint, "destPoint");
@@ -438,9 +438,9 @@ public class DefaultRouter
     else if (dest.getDestination().getReferentClass() == Location.class) {
       final Set<Point> result = new HashSet<>();
       final Location destLoc = objectService.fetchObject(Location.class,
-                                                         dest.getDestination().getName());
+          dest.getDestination().getName());
       final LocationType destLocType = objectService.fetchObject(LocationType.class,
-                                                                 destLoc.getType());
+          destLoc.getType());
       for (Location.Link curLink : destLoc.getAttachedLinks()) {
         // A link is acceptable if any of the following conditions are true:
         // - The destination operation is OP_NOP, which is allowed everywhere.
@@ -451,7 +451,7 @@ public class DefaultRouter
         if (Destination.OP_NOP.equals(dest.getOperation())
             || curLink.hasAllowedOperation(dest.getOperation())
             || (curLink.getAllowedOperations().isEmpty()
-                && destLocType.isAllowedOperation(dest.getOperation()))) {
+            && destLocType.isAllowedOperation(dest.getOperation()))) {
           Point destPoint = objectService.fetchObject(Point.class, curLink.getPoint());
           if (destPoint.isHaltingPosition()) {
             result.add(destPoint);
@@ -459,8 +459,7 @@ public class DefaultRouter
         }
       }
       return result;
-    }
-    else {
+    } else {
       return new HashSet<>();
     }
   }
@@ -499,7 +498,7 @@ public class DefaultRouter
      * Creates a new OrderRouteParameterStruct.
      *
      * @param driveOrders A list of drive orders to be processed as checkpoints
-     * of the route to be computed.
+     *                    of the route to be computed.
      * @param pointRouter The point router for the vehicle type.
      */
     OrderRouteParameterStruct(DriveOrder[] driveOrders,
@@ -535,8 +534,8 @@ public class DefaultRouter
      * Creates a new OrderRouteResultStruct.
      *
      * @param driveOrderCount The number of <code>DriveOrder</code>s in the
-     * <code>TransportOrder</code> for which this struct is to store the
-     * routing result.
+     *                        <code>TransportOrder</code> for which this struct is to store the
+     *                        routing result.
      */
     OrderRouteResultStruct(int driveOrderCount) {
       currentRoute = new DriveOrder[driveOrderCount];
@@ -544,5 +543,81 @@ public class DefaultRouter
       bestRoute = new DriveOrder[driveOrderCount];
       bestCosts = Long.MAX_VALUE;
     }
+
+
+  }
+
+  private Collection<Point> getUnusablePoints(Point sourcePoint, Vehicle vehicle) {
+    Collection<Point> unusablePoints = new HashSet<>();
+    Set<Vehicle> allVehicles = objectService.fetchObjects(Vehicle.class);
+    Set<Vehicle> occupyUnusablePointVehicles1 = new HashSet<>();
+    Set<Vehicle> occupyUnusablePointVehicles2 = new HashSet<>();
+    for (Vehicle ve : allVehicles) {
+      //Skip the given vehicle
+      if (ve.getName() == vehicle.getName()) {
+        continue;
+      }
+      if (ve.getCurrentPosition() == null) {
+        continue;
+      }
+      //For idle vehicle
+      if (ve.hasState(Vehicle.State.IDLE)) {
+        occupyUnusablePointVehicles1.add(ve);
+        continue;
+      }
+      //For vehicle processing order
+      if (ve.hasProcState(Vehicle.ProcState.PROCESSING_ORDER)) {
+        boolean willAdd = true;
+        for (TransportOrder to : objectService.fetchObjects(TransportOrder.class)) {
+          //The vehicle is intended for TOrder
+          if ((to.hasState(TransportOrder.State.ACTIVE)
+              || to.hasState(TransportOrder.State.DISPATCHABLE))
+              && to.getIntendedVehicle().getName() == ve.getName()) {
+            willAdd = false;
+            break;
+          }
+        }
+        if (willAdd) {
+          occupyUnusablePointVehicles2.add(ve);
+        }
+      }
+    }
+    //Get all idle vehicle's CurrentPosition
+    for (Vehicle ve : occupyUnusablePointVehicles1) {
+      for (Point curPoint : objectService.fetchObjects(Point.class)) {
+        //Skip the source point
+        if (curPoint.getName().equals(ve.getCurrentPosition().getName())
+            && !sourcePoint.getName().equals(ve.getCurrentPosition().getName())) {
+          unusablePoints.add(curPoint);
+          break;
+        }
+      }
+    }
+    //Get each vehicle which is processing TO and no subsequent TO for it,
+    //the destination is a dead point.
+    for (Vehicle ve : occupyUnusablePointVehicles2) {
+      TransportOrder to = objectService.fetchObject(TransportOrder.class, ve.getTransportOrder().getName());
+      List<DriveOrder> dos = to.getAllDriveOrders();
+      Point destinationPoint = dos.get(dos.size() - 1).getRoute().getFinalDestinationPoint();
+      for (Point curPoint : objectService.fetchObjects(Point.class)) {
+        //skip the source point
+        if (curPoint.getName().equals(destinationPoint.getName())
+            && !sourcePoint.getName().equals(ve.getCurrentPosition().getName())) {
+          unusablePoints.add(curPoint);
+          break;
+        }
+      }
+    }
+    //skip the source point
+    if (!unusablePoints.contains(sourcePoint)) {
+      unusablePoints.remove(sourcePoint);
+    }
+    return unusablePoints;
+  }
+
+
+  private PointRouter getActualPointRouter(Point sourcePoint,Vehicle vehicle) {
+    Collection<Point> unusablePoints = getUnusablePoints(sourcePoint, vehicle);
+    return pointRouterFactory.createMyPointRouter(vehicle,unusablePoints);
   }
 }

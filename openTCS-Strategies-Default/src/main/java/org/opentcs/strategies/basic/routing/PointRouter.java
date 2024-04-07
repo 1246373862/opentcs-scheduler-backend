@@ -7,6 +7,7 @@
  */
 package org.opentcs.strategies.basic.routing;
 
+import java.util.Collection;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
 import org.opentcs.data.TCSObjectReference;
@@ -63,4 +64,6 @@ public interface PointRouter {
 
     return getCosts(srcPoint.getReference(), destPoint.getReference());
   }
+
+  PointRouter removeUnusablePoints(Collection<Point> unusablePoints);
 }

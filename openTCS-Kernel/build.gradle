@@ -21,6 +21,9 @@ dependencies {
   api project(':openTCS-Kernel-Extension-RMI-Services')
 
   implementation group: 'de.huxhorn.sulky', name: 'de.huxhorn.sulky.ulid', version: '8.3.0'
+    implementation project(path: ':openTCS-Strategies-Default')
+  implementation project(path: ':openTCS-Strategies-Default')
+  implementation project(path: ':openTCS-Strategies-Default')
 
   runtimeOnly group: 'org.slf4j', name: 'slf4j-jdk14', version: '1.7.36'
 }
