@@ -8,6 +8,9 @@
 package org.opentcs.strategies.basic.routing.jgrapht;
 
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+
 import static java.util.Objects.requireNonNull;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
@@ -64,14 +67,18 @@ public class DefaultModelGraphMapper
     edgeEvaluator.onGraphComputationStart(vehicle);
 
     Graph<String, Edge> graph = new DirectedWeightedMultigraph<>(Edge.class);
-
+    Set<String> pointsNames = new HashSet<>();
     for (Point point : points) {
       graph.addVertex(point.getName());
+      pointsNames.add(point.getName());
     }
 
     boolean allowNegativeEdgeWeights = configuration.algorithm().isHandlingNegativeCosts();
 
     for (Path path : paths) {
+      if(!pointsNames.contains(path.getSourcePoint().getName())||!pointsNames.contains(path.getDestinationPoint().getName())){
+        continue;
+      }
       if (shouldAddForwardEdge(path, vehicle)) {
         Edge edge = new Edge(path, false);
         double weight = edgeEvaluator.computeWeight(edge, vehicle);

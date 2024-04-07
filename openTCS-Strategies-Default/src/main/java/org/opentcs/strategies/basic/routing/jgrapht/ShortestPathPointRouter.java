@@ -7,12 +7,8 @@
  */
 package org.opentcs.strategies.basic.routing.jgrapht;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
+
 import static java.util.Objects.requireNonNull;
 import org.jgrapht.GraphPath;
 import org.jgrapht.alg.interfaces.ShortestPathAlgorithm;
@@ -96,6 +92,19 @@ public class ShortestPathPointRouter
     }
 
     return (long) graphPath.getWeight();
+  }
+
+  @Override
+  public PointRouter removeUnusablePoints(Collection<Point> unusablePoints) {
+    if(unusablePoints.size()==0){
+      return this;
+    }
+    Collection<Point> _points = new HashSet<>();
+    _points.addAll(this.points.values());
+    for (Point pt:unusablePoints){
+      _points.remove(pt);
+    }
+    return new ShortestPathPointRouter(this.algo,_points);
   }
 
   private List<Route.Step> translateToSteps(GraphPath<String, Edge> graphPath) {
