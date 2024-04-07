@@ -1,35 +1,19 @@
-HELP.md
-target/
-!.mvn/wrapper/maven-wrapper.jar
-!**/src/main/**/target/
-!**/src/test/**/target/
-logs/**
-### STS ###
-.apt_generated
-.classpath
-.factorypath
-.project
-.settings
-.springBeans
-.sts4-cache
-.gradle
-### IntelliJ IDEA ###
+/target/
 .idea
-*.iws
 *.iml
-*.ipr
-*.log
-*.log.gz
-### NetBeans ###
-/nbproject/private/
-/nbbuild/
-/dist/
-/nbdist/
-/.nb-gradle/
-build/
-!**/src/main/**/build/
-!**/src/test/**/build/
-
-### VS Code ###
-.vscode/
-logs/
+.tags
+.tags_sorted_by_file
+.pyc
+__pycache__
+.cache
+.settings
+.classpath
+.project
+.DS_Store
+*.pid
+*Help
+target
+log.*
+.DS_Store
+log.home_IS_UNDEFINED
+doc/api_doc
