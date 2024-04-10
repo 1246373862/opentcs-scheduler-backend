@@ -1,6 +1,7 @@
 package com.server.web.service;
 
 import org.opentcs.data.model.Location;
+import org.opentcs.data.model.PlantModel;
 import org.opentcs.data.model.Point;
 
 import java.awt.*;
@@ -12,4 +13,6 @@ public interface MapService {
   Set<Point> getPoints();
 
   Set<Location> getLocations();
+
+  PlantModel getMap();
 }

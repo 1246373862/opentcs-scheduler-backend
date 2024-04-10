@@ -32,4 +32,10 @@ public class MapController extends BaseController {
   public AjaxResult getLocations() {
     return AjaxResult.success(mapService.getLocations());
   }
+
+  @ApiOperation("获取地图信息")
+  @GetMapping("/map")
+  public AjaxResult getMap() {
+    return AjaxResult.success(mapService.getMap());
+  }
 }
