@@ -16,7 +16,12 @@
     </description>
 
     <dependencies>
-
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.22</version>
+            <scope>provided</scope>
+        </dependency>
         <!-- 通用工具-->
         <dependency>
             <groupId>com.server</groupId>

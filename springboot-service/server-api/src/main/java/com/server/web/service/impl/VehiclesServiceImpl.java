@@ -74,6 +74,7 @@ public class VehiclesServiceImpl
     Vehicle vehicle = vehiclesService.fetchObject(Vehicle.class, vehiclesQueryDTO.getName());
     vehiclesService.enableCommAdapter(vehicle.getReference());
     vehiclesService.sendCommAdapterCommand(vehicle.getReference(), new SetPositionCommand(vehiclesQueryDTO.getPoint()));
+    vehiclesService.updateVehicleIntegrationLevel(vehicle.getReference(), Vehicle.IntegrationLevel.TO_BE_UTILIZED);
   }
 
   @Override
@@ -111,6 +112,10 @@ public class VehiclesServiceImpl
         }
         vehiclesInfoVO.getClaimedResources().add(list);
       }
+      if(vehicle.getCurrentPosition()!=null){
+        vehiclesInfoVO.setCurrentPosition(vehicle.getCurrentPosition().getName());
+      }
+
       return vehiclesInfoVO;
     }).collect(Collectors.toList()));
   }

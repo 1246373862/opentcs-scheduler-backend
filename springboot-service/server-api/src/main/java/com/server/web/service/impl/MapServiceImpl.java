@@ -4,6 +4,7 @@ import com.server.web.kernel.KernelServiceConfig;
 import com.server.web.service.MapService;
 import org.opentcs.access.KernelServicePortal;
 import org.opentcs.components.kernel.services.PlantModelService;
+import org.opentcs.components.kernel.services.RouterService;
 import org.opentcs.data.model.Location;
 import org.opentcs.data.model.PlantModel;
 import org.opentcs.data.model.Point;

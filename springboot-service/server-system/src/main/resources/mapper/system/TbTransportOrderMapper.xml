@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.server.system.mapper.TbTransportOrderMapper">
+
+    <resultMap type="TbTransportOrder" id="TbTransportOrderResult">
+        <result property="id"    column="id"    />
+        <result property="name"    column="name"    />
+        <result property="dispensable"    column="dispensable"    />
+        <result property="type"    column="type"    />
+        <result property="state"    column="state"    />
+        <result property="intendedVehicle"    column="intended_vehicle"    />
+        <result property="processingVehicle"    column="processing_vehicle"    />
+        <result property="destinations"    column="destinations"    />
+        <result property="creationTime"    column="creation_time"    />
+        <result property="deadline"    column="deadline"    />
+        <result property="finishedTime"    column="finished_time"    />
+    </resultMap>
+
+    <sql id="selectTbTransportOrderVo">
+        select id, name, dispensable, type, state, intended_vehicle, processing_vehicle, destinations, creation_time, deadline, finished_time from tb_transport_order
+    </sql>
+
+    <select id="selectTbTransportOrderList" parameterType="TbTransportOrder" resultMap="TbTransportOrderResult">
+        <include refid="selectTbTransportOrderVo"/>
+        <where>
+            <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
+            <if test="dispensable != null "> and dispensable = #{dispensable}</if>
+            <if test="type != null  and type != ''"> and type = #{type}</if>
+            <if test="state != null  and state != ''"> and state = #{state}</if>
+            <if test="intendedVehicle != null  and intendedVehicle != ''"> and intended_vehicle = #{intendedVehicle}</if>
+            <if test="processingVehicle != null  and processingVehicle != ''"> and processing_vehicle = #{processingVehicle}</if>
+            <if test="destinations != null  and destinations != ''"> and destinations = #{destinations}</if>
+            <if test="creationTime != null "> and creation_time = #{creationTime}</if>
+            <if test="deadline != null "> and deadline = #{deadline}</if>
+            <if test="finishedTime != null "> and finished_time = #{finishedTime}</if>
+        </where>
+    </select>
+
+
+  <select id="selectTbTransportOrderById" parameterType="String" resultMap="TbTransportOrderResult">
+        select id, name, dispensable, type, state, intended_vehicle, processing_vehicle, destinations, creation_time, deadline, finished_time from tb_transport_order where name like concat('%', #{name}, '%')
+    </select>
+
+    <insert id="insertTbTransportOrder" parameterType="TbTransportOrder">
+        insert into tb_transport_order
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="name != null">name,</if>
+            <if test="dispensable != null">dispensable,</if>
+            <if test="type != null">type,</if>
+            <if test="state != null">state,</if>
+            <if test="intendedVehicle != null">intended_vehicle,</if>
+            <if test="processingVehicle != null">processing_vehicle,</if>
+            <if test="destinations != null">destinations,</if>
+            <if test="creationTime != null">creation_time,</if>
+            <if test="deadline != null">deadline,</if>
+            <if test="finishedTime != null">finished_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="name != null">#{name},</if>
+            <if test="dispensable != null">#{dispensable},</if>
+            <if test="type != null">#{type},</if>
+            <if test="state != null">#{state},</if>
+            <if test="intendedVehicle != null">#{intendedVehicle},</if>
+            <if test="processingVehicle != null">#{processingVehicle},</if>
+            <if test="destinations != null">#{destinations},</if>
+            <if test="creationTime != null">#{creationTime},</if>
+            <if test="deadline != null">#{deadline},</if>
+            <if test="finishedTime != null">#{finishedTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateTbTransportOrder" parameterType="TbTransportOrder">
+        update tb_transport_order
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="name != null">name = #{name},</if>
+            <if test="dispensable != null">dispensable = #{dispensable},</if>
+            <if test="type != null">type = #{type},</if>
+            <if test="state != null">state = #{state},</if>
+            <if test="intendedVehicle != null">intended_vehicle = #{intendedVehicle},</if>
+            <if test="processingVehicle != null">processing_vehicle = #{processingVehicle},</if>
+            <if test="destinations != null">destinations = #{destinations},</if>
+            <if test="creationTime != null">creation_time = #{creationTime},</if>
+            <if test="deadline != null">deadline = #{deadline},</if>
+            <if test="finishedTime != null">finished_time = #{finishedTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteTbTransportOrderById" parameterType="Long">
+        delete from tb_transport_order where id = #{id}
+    </delete>
+
+    <delete id="deleteTbTransportOrderByIds" parameterType="String">
+        delete from tb_transport_order where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

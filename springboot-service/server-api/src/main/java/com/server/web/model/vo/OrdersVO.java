@@ -6,6 +6,7 @@ import org.opentcs.data.order.TransportOrder;
 import org.opentcs.kernel.extensions.servicewebapi.v1.binding.shared.DestinationState;
 
 import javax.annotation.Nullable;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -32,6 +33,10 @@ public class OrdersVO {
   private String processingVehicle;
 
   private List<DestinationState> destinations = new ArrayList<>();
+
+  private Instant creationTime;
+  private Instant deadline;
+  private Instant finishedTime;
 
   public OrdersVO() {
   }
@@ -129,6 +134,9 @@ public class OrdersVO {
       return null;
     }
     OrdersVO transportOrderState = new OrdersVO();
+    transportOrderState.setCreationTime(transportOrder.getCreationTime());
+    transportOrderState.setDeadline(transportOrder.getDeadline());
+    transportOrderState.setFinishedTime(transportOrder.getFinishedTime());
     transportOrderState.setDispensable(transportOrder.isDispensable());
     transportOrderState.setName(transportOrder.getName());
     transportOrderState.setPeripheralReservationToken(
