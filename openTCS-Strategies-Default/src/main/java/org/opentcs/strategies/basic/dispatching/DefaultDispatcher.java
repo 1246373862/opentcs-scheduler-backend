@@ -11,6 +11,8 @@ import org.opentcs.strategies.basic.dispatching.phase.assignment.OrderAssigner;
 import static com.google.common.base.Preconditions.checkState;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
+import static org.opentcs.strategies.basic.dispatching.DefaultDispatcherConfiguration.RerouteTrigger.ROUTE_STEP_FINISHED;
+
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
@@ -218,7 +220,7 @@ public class DefaultDispatcher
       LOG.debug("Scheduling reroute task...");
       kernelExecutor.submit(() -> {
         LOG.info("Rerouting all vehicles due to topology change...");
-        rerouteUtil.reroute(vehicleService.fetchObjects(Vehicle.class), ReroutingType.REGULAR);
+        rerouteUtil.reroute(vehicleService.fetchObjects(Vehicle.class));
       });
     }
   }
@@ -233,7 +235,7 @@ public class DefaultDispatcher
           reroutingType,
           vehicle.getCurrentPosition() == null ? null : vehicle.getCurrentPosition().getName()
       );
-      rerouteUtil.reroute(vehicle, reroutingType);
+      rerouteUtil.reroute(vehicle);
     });
   }
 
@@ -257,5 +259,22 @@ public class DefaultDispatcher
         List.of(vehicleService.fetchObject(Vehicle.class, transportOrder.getIntendedVehicle())),
         List.of(transportOrder)
     );
+  }
+
+  @Override
+  public void vehicleUpdatedProgressIndex() {
+    if (configuration.rerouteTrigger() == ROUTE_STEP_FINISHED)
+    {
+      LOG.debug("Scheduling reroute task...");
+      kernelExecutor.submit(() ->
+      {
+        LOG.debug(
+                "Rerouting vehicles due to a vehicle updated progress index...");
+        /// Sorry for the inconvenience of displaying my relevant code
+        /// here, include the update for method "getUnusablePoints"!
+        /// TODO: to be optimized!!!
+        rerouteUtil.reroute(vehicleService.fetchObjects(Vehicle.class));
+      });
+    }
   }
 }

@@ -570,9 +570,9 @@ public class DefaultRouter
         boolean willAdd = true;
         for (TransportOrder to : objectService.fetchObjects(TransportOrder.class)) {
           //The vehicle is intended for TOrder
-          if ((to.hasState(TransportOrder.State.ACTIVE)
+          if (to.getIntendedVehicle() != null && (to.hasState(TransportOrder.State.ACTIVE)
               || to.hasState(TransportOrder.State.DISPATCHABLE))
-              && to.getIntendedVehicle().getName() == ve.getName()) {
+              && Objects.equals(to.getIntendedVehicle().getName(), ve.getName())) {
             willAdd = false;
             break;
           }
@@ -599,6 +599,42 @@ public class DefaultRouter
       TransportOrder to = objectService.fetchObject(TransportOrder.class, ve.getTransportOrder().getName());
       List<DriveOrder> dos = to.getAllDriveOrders();
       Point destinationPoint = dos.get(dos.size() - 1).getRoute().getFinalDestinationPoint();
+      /// 若车辆vehicle的当前位置是车辆ve尚未走完的路段的端点之一,则ve的终点并非真的不可用
+
+      String vehiclePositionName = vehicle.getCurrentPosition().getName();
+      boolean foundPN = false;
+      boolean will_skip = false;
+
+      /// 对于车辆ve,构造出其尚未走完的路段的终点的集合
+      Set<String> namesOfPointToTravel = new HashSet<>();
+      String positionName = ve.getCurrentPosition().getName();
+      if (positionName.equals(dos.get(0).getRoute().getSteps().get(0).getSourcePoint().getName())) {
+        foundPN = true;
+      }
+      for (DriveOrder do_: dos) {
+        List<Route.Step> steps = do_.getRoute().getSteps();
+        for (Route.Step step: steps) {
+          String pointName = step.getDestinationPoint().getName();
+          if (!foundPN && positionName.equals(pointName)) {
+            foundPN = true;
+            continue;
+          }
+          if (foundPN) {
+            namesOfPointToTravel.add(pointName);
+          }
+        }
+      }
+      /// 车辆vehicle的当前位置先于ve到达二者的公共路段
+      for (String name: namesOfPointToTravel) {
+        if (vehiclePositionName.equals(name)) {
+          will_skip = true;
+          break;
+        }
+      }
+      if (will_skip) {
+        continue;
+      }
+
       for (Point curPoint : objectService.fetchObjects(Point.class)) {
         //skip the source point
         if (curPoint.getName().equals(destinationPoint.getName())

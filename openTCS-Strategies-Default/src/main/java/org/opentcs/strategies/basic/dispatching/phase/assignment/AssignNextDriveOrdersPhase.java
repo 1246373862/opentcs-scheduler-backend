@@ -131,7 +131,7 @@ public class AssignNextDriveOrdersPhase
         if (configuration.rerouteOnDriveOrderFinished()) {
           LOG.debug("Trying to reroute vehicle '{}' before assigning the next drive order...",
                     vehicle.getName());
-          rerouteUtil.reroute(vehicle, ReroutingType.REGULAR);
+          rerouteUtil.reroute(vehicle);
         }
 
         // Get an up-to-date copy of the transport order in case the route changed.

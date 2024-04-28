@@ -123,4 +123,6 @@ public interface Dispatcher
       throws TransportOrderAssignmentException {
     throw new UnsupportedOperationException("Not supported yet.");
   }
+
+  void vehicleUpdatedProgressIndex();
 }

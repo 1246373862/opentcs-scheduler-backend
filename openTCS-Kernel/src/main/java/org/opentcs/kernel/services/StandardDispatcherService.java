@@ -104,4 +104,9 @@ public class StandardDispatcherService
       dispatcher.assignNow(objectRepo.getObject(TransportOrder.class, ref));
     }
   }
+
+  @Override
+  public void vehicleUpdatedProgressIndex() {
+      dispatcher.vehicleUpdatedProgressIndex();
+  }
 }

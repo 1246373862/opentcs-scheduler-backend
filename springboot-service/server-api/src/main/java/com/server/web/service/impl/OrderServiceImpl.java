@@ -50,11 +50,11 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public List<TbTransportOrder> getOrders(String number) {
-      if(!StringUtils.isEmpty(number)){
-        return this.selectByNumber(number);
-      }else {
-        return tbTransportOrderService.selectTbTransportOrderList(null);
-      }
+        if (!StringUtils.isEmpty(number)) {
+            return this.selectByNumber(number);
+        } else {
+            return tbTransportOrderService.selectTbTransportOrderList(null);
+        }
 
     }
 
@@ -71,56 +71,56 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void createOrder(TransportOrderCreationDTO creationDTO) {
-        if(StringUtils.isEmpty(creationDTO.getVehicleName())){
+        if (StringUtils.isEmpty(creationDTO.getVehicleName())) {
             creationDTO.setVehicleName(null);
         }
-      String number = "Order-"+System.currentTimeMillis();
-      List<DestinationCreationTO> destinationCreationTOS = new ArrayList<>();
-      for (DestinationCreationDTO dto:creationDTO.getDestinations()){
-        DestinationCreationTO destinationCreationTO = new DestinationCreationTO(dto.getDestLocationName(),dto.getDestOperation());
-        destinationCreationTOS.add(destinationCreationTO);
-      }
+        String number = "Order-" + System.currentTimeMillis();
+        List<DestinationCreationTO> destinationCreationTOS = new ArrayList<>();
+        for (DestinationCreationDTO dto : creationDTO.getDestinations()) {
+            DestinationCreationTO destinationCreationTO = new DestinationCreationTO(dto.getDestLocationName(), dto.getDestOperation());
+            destinationCreationTOS.add(destinationCreationTO);
+        }
         TransportOrderCreationTO orderTO
                 = new TransportOrderCreationTO(number, destinationCreationTOS);
         orderTO = orderTO
-            .withDispensable(creationDTO.getDispensable())
+                .withDispensable(creationDTO.getDispensable())
                 .withIntendedVehicleName(creationDTO.getVehicleName())
                 .withDeadline(Instant.now().plus(1, ChronoUnit.HOURS));
         transportOrderService.createTransportOrder(orderTO);
-        //todo 订单入库
-
+        // 订单入库
         TransportOrder order = vehicleService.fetchObject(TransportOrder.class, number);
         OrdersVO vo = OrdersVO.fromTransportOrder(order);
         TbTransportOrder tbTransportOrder = convert2entity(vo);
         tbTransportOrderService.insertTbTransportOrder(tbTransportOrder);
     }
+
     @Override
-    public TbTransportOrder convert2entity(OrdersVO vo){
-      TbTransportOrder tbTransportOrder = new TbTransportOrder();
-      BeanUtils.copyProperties(vo,tbTransportOrder,"id");
-      tbTransportOrder.setDestinations(JSON.toJSONString(vo.getDestinations()));
-      tbTransportOrder.setState(vo.getState().name());
-      tbTransportOrder.setCreationTime(LocalDateTime.ofInstant(vo.getCreationTime().plusMillis(TimeUnit.HOURS.toMillis(0)), ZoneId.systemDefault()));
-      tbTransportOrder.setDeadline(LocalDateTime.ofInstant(vo.getDeadline().plusMillis(TimeUnit.HOURS.toMillis(0)), ZoneId.systemDefault()));
-      tbTransportOrder.setFinishedTime(LocalDateTime.ofInstant(vo.getCreationTime().plusMillis(TimeUnit.HOURS.toMillis(0)), ZoneId.systemDefault()));
-      return tbTransportOrder;
+    public TbTransportOrder convert2entity(OrdersVO vo) {
+        TbTransportOrder tbTransportOrder = new TbTransportOrder();
+        BeanUtils.copyProperties(vo, tbTransportOrder, "id");
+        tbTransportOrder.setDestinations(JSON.toJSONString(vo.getDestinations()));
+        tbTransportOrder.setState(vo.getState().name());
+        tbTransportOrder.setCreationTime(LocalDateTime.ofInstant(vo.getCreationTime().plusMillis(TimeUnit.HOURS.toMillis(0)), ZoneId.systemDefault()));
+        tbTransportOrder.setDeadline(LocalDateTime.ofInstant(vo.getDeadline().plusMillis(TimeUnit.HOURS.toMillis(0)), ZoneId.systemDefault()));
+        tbTransportOrder.setFinishedTime(LocalDateTime.ofInstant(vo.getCreationTime().plusMillis(TimeUnit.HOURS.toMillis(0)), ZoneId.systemDefault()));
+        return tbTransportOrder;
     }
 
-  @Override
-  public void updateTransportOrderIntendedVehicle(UpdateTransportOrderIntendedVehicleDTO dto) {
-    TransportOrder transportOrder =  transportOrderService.fetchObject(TransportOrder.class,dto.getName());
-    Vehicle vehicle = vehicleService.fetchObject(Vehicle.class,dto.getVehicleName());
-    transportOrderService.updateTransportOrderIntendedVehicle(transportOrder.getReference(),vehicle.getReference());
-  }
+    @Override
+    public void updateTransportOrderIntendedVehicle(UpdateTransportOrderIntendedVehicleDTO dto) {
+        TransportOrder transportOrder = transportOrderService.fetchObject(TransportOrder.class, dto.getName());
+        Vehicle vehicle = vehicleService.fetchObject(Vehicle.class, dto.getVehicleName());
+        transportOrderService.updateTransportOrderIntendedVehicle(transportOrder.getReference(), vehicle.getReference());
+    }
 
-  @Override
+    @Override
     public TbTransportOrder selectOneByNumber(String number) {
-      return tbTransportOrderService.selectTbTransportOrderById(number);
+        return tbTransportOrderService.selectTbTransportOrderById(number);
     }
 
-  private List<TbTransportOrder> selectByNumber(String number) {
-    TbTransportOrder tbTransportOrder = new TbTransportOrder();
-    tbTransportOrder.setName(number);
-    return tbTransportOrderService.selectTbTransportOrderList(tbTransportOrder);
-  }
+    private List<TbTransportOrder> selectByNumber(String number) {
+        TbTransportOrder tbTransportOrder = new TbTransportOrder();
+        tbTransportOrder.setName(number);
+        return tbTransportOrderService.selectTbTransportOrderList(tbTransportOrder);
+    }
 }

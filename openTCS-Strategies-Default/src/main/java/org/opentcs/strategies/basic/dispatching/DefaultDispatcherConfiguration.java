@@ -166,10 +166,26 @@ public interface DefaultDispatcherConfiguration {
       orderKey = "9_misc")
   long idleVehicleRedispatchingInterval();
 
+  @ConfigurationEntry(
+          type = "String",
+          description = "",
+          changesApplied = ConfigurationEntry.ChangesApplied.INSTANTLY,
+          orderKey = "1_orders_special_2")
+  RerouteTrigger rerouteTrigger();
+  /*...*/
+  enum RerouteTrigger {
+    /*...*/
+    TOPOLOGY_CHANGE
+    /// ------------------------------------------------------------------------
+    , ROUTE_STEP_FINISHED
+    /// ------------------------------------------------------------------------
+    ;
+  }
   /**
    * The available strategies for situations in which rerouting is not possible.
    */
   enum ReroutingImpossibleStrategy {
+
     /**
      * Stick to the previous route, ignoring path locks.
      */

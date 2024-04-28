@@ -88,4 +88,6 @@ public interface DispatcherService {
       throws ObjectUnknownException, TransportOrderAssignmentException, KernelRuntimeException {
     throw new UnsupportedOperationException("Not supported yet.");
   }
+
+  void vehicleUpdatedProgressIndex();
 }

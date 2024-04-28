@@ -36,6 +36,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="deadline != null "> and deadline = #{deadline}</if>
             <if test="finishedTime != null "> and finished_time = #{finishedTime}</if>
         </where>
+      ORDER BY creation_time
     </select>
 
 

@@ -11,6 +11,7 @@ import java.util.Collection;
 import java.util.Iterator;
 
 import static java.util.Objects.requireNonNull;
+import static org.opentcs.components.kernel.Router.PROPKEY_ROUTING_GROUP;
 
 import java.util.Set;
 import javax.annotation.Nonnull;
@@ -19,6 +20,8 @@ import org.jgrapht.Graph;
 import org.jgrapht.alg.interfaces.ShortestPathAlgorithm;
 import org.opentcs.components.kernel.routing.Edge;
 import org.opentcs.components.kernel.services.TCSObjectService;
+import org.opentcs.data.TCSObjectReference;
+import org.opentcs.data.model.Group;
 import org.opentcs.data.model.Path;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
@@ -62,24 +65,37 @@ public abstract class AbstractPointRouterFactory
   public PointRouter createPointRouter(Vehicle vehicle) {
     requireNonNull(vehicle, "vehicle");
 
+//    long timeStampBefore = System.currentTimeMillis();
+//
+//    Set<Point> points = objectService.fetchObjects(Point.class);
+//    Graph<String, Edge> graph = mapper.translateModel(points,
+//        objectService.fetchObjects(Path.class),
+//        vehicle);
+//    PointRouter router = new ShortestPathPointRouter(createShortestPathAlgorithm(graph), points);
+////    PointRouter router = createPointRouterInternal(vehicle, points);
+//    // Make a single request for a route from one point to a different one to make sure the
+//    // point router is primed. (Some implementations are initialized lazily.)
+//    if (points.size() >= 2) {
+//      Iterator<Point> pointIter = points.iterator();
+//      router.getRouteSteps(pointIter.next(), pointIter.next());
+//    }
+//
+//    LOG.debug("Created point router for {} in {} milliseconds.",
+//        vehicle.getName(),
+//        System.currentTimeMillis() - timeStampBefore);
+//
+//    return router;
     long timeStampBefore = System.currentTimeMillis();
 
     Set<Point> points = objectService.fetchObjects(Point.class);
-    Graph<String, Edge> graph = mapper.translateModel(points,
-        objectService.fetchObjects(Path.class),
-        vehicle);
-    PointRouter router = new ShortestPathPointRouter(createShortestPathAlgorithm(graph), points);
-//    PointRouter router = createPointRouterInternal(vehicle, points);
-    // Make a single request for a route from one point to a different one to make sure the
-    // point router is primed. (Some implementations are initialized lazily.)
-    if (points.size() >= 2) {
-      Iterator<Point> pointIter = points.iterator();
-      router.getRouteSteps(pointIter.next(), pointIter.next());
-    }
+
+
+    PointRouter router = createPointRouterInternal(vehicle, points);
+
 
     LOG.debug("Created point router for {} in {} milliseconds.",
-        vehicle.getName(),
-        System.currentTimeMillis() - timeStampBefore);
+            vehicle.getName(),
+            System.currentTimeMillis() - timeStampBefore);
 
     return router;
   }
@@ -98,30 +114,57 @@ public abstract class AbstractPointRouterFactory
     }
     PointRouter router = createPointRouterInternal(vehicle, points);
 
-    LOG.info("路由创建成功 for {} in {} milliseconds.",
-        vehicle.getName(),
-        System.currentTimeMillis() - timeStampBefore);
+    LOG.debug("Created point router for {} in {} milliseconds.",
+            vehicle.getName(),
+            System.currentTimeMillis() - timeStampBefore);
 
     return router;
   }
 
-  private PointRouter createPointRouterInternal(Vehicle vehicle, Collection<Point> points) {
+  private static final String DEFAULT_ROUTING_GROUP = "";
+  private String getRoutingGroupOfVehicle(Vehicle vehicle) {
+    String propVal = vehicle.getProperty(PROPKEY_ROUTING_GROUP);
+    return propVal == null ? DEFAULT_ROUTING_GROUP : propVal.strip();
+  }
+  private PointRouter createPointRouterInternal(
+          Vehicle vehicle,
+          Collection<Point> points)
+  {
+    boolean usingGroupFilter = true;
+    String groupName = getRoutingGroupOfVehicle(vehicle);
+
+    if (groupName.isEmpty()) {
+      usingGroupFilter = false;
+    }
+    if (usingGroupFilter) {
+      Set<Group> allGroups = objectService.fetchObjects(Group.class);
+      for (Group group: allGroups) {
+        if (group.getName().equals(groupName)) {
+          Set<TCSObjectReference<?>> members = group.getMembers();
+          break;
+        }
+      }
+    }
+
     Set<Path> allPaths = objectService.fetchObjects(Path.class);
-    allPaths.removeIf(value -> (points.contains(value.getSourcePoint())
-        || points.contains(value.getDestinationPoint())));
-    Graph<String, Edge> graph = mapper.translateModel(
-        points, allPaths, vehicle);
+    allPaths.removeIf(
+        value->(
+            points.contains(value.getSourcePoint())
+                || points.contains(value.getDestinationPoint())));
+    Graph<String, Edge> graph = mapper.translateModel(points, allPaths, vehicle);
+
     PointRouter router = new ShortestPathPointRouter(createShortestPathAlgorithm(graph), points);
-    // Make a single request for a route from one point
-    // to a different one to make sure the
+    // Make a single request for a route from one point to a different one to make sure the
     // point router is primed. (Some implementations are initialized lazily.)
     if (points.size() >= 2) {
       Iterator<Point> pointIter = points.iterator();
-      router.getRouteSteps(pointIter.next(), pointIter.next());
+      router.getRouteSteps(
+          pointIter.next(),
+          pointIter.next());
     }
+
     return router;
   }
-
   /**
    * Returns a shortest path algorithm implementation working on the given graph.
    *

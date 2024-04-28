@@ -63,39 +63,52 @@ public class DefaultModelGraphMapper
     requireNonNull(points, "points");
     requireNonNull(paths, "paths");
     requireNonNull(vehicle, "vehicle");
-
-    edgeEvaluator.onGraphComputationStart(vehicle);
-
     Graph<String, Edge> graph = new DirectedWeightedMultigraph<>(Edge.class);
-    Set<String> pointsNames = new HashSet<>();
+
+    /// ------------------------------------------------------------------------
+    /// Support reroute while a vehicle arrives
+    /// the destination of a step of the route.
+    /// added by Catching Xu with email of a0soft@163.com.
+    Set<String> pointNames = new HashSet<>();
+    /// ------------------------------------------------------------------------
     for (Point point : points) {
       graph.addVertex(point.getName());
-      pointsNames.add(point.getName());
+
+      /// ----------------------------------------------------------------------
+      /// Support reroute while a vehicle arrives
+      /// the destination of a step of the route.
+      /// added by Catching Xu with email of a0soft@163.com.
+      pointNames.add(point.getName());
+      /// ----------------------------------------------------------------------
     }
 
     boolean allowNegativeEdgeWeights = configuration.algorithm().isHandlingNegativeCosts();
 
     for (Path path : paths) {
-      if(!pointsNames.contains(path.getSourcePoint().getName())||!pointsNames.contains(path.getDestinationPoint().getName())){
+      /// ----------------------------------------------------------------------
+      /// skip the path with vertex not existing.
+      /// added by Catching Xu with email of a0soft@163.com.
+      if (!pointNames.contains(path.getSourcePoint().getName())
+              || !pointNames.contains(path.getDestinationPoint().getName()))
+      {
         continue;
       }
+      /// ----------------------------------------------------------------------
+
       if (shouldAddForwardEdge(path, vehicle)) {
         Edge edge = new Edge(path, false);
         double weight = edgeEvaluator.computeWeight(edge, vehicle);
 
         if (weight < 0 && !allowNegativeEdgeWeights) {
           LOG.warn("Edge {} with weight {} ignored. Algorithm {} cannot handle negative weights.",
-                   edge,
-                   weight,
-                   configuration.algorithm().name());
-        }
-        else if (weight == Double.POSITIVE_INFINITY) {
-          LOG.debug("Edge {} with infinite weight ignored.", edge);
+                  edge,
+                  weight,
+                  configuration.algorithm().name());
         }
         else {
           graph.addEdge(path.getSourcePoint().getName(),
-                        path.getDestinationPoint().getName(),
-                        edge);
+                  path.getDestinationPoint().getName(),
+                  edge);
           graph.setEdgeWeight(edge, weight);
         }
       }
@@ -106,25 +119,83 @@ public class DefaultModelGraphMapper
 
         if (weight < 0 && !allowNegativeEdgeWeights) {
           LOG.warn("Edge {} with weight {} ignored. Algorithm {} cannot handle negative weights.",
-                   edge,
-                   weight,
-                   configuration.algorithm().name());
-        }
-        else if (weight == Double.POSITIVE_INFINITY) {
-          LOG.debug("Edge {} with infinite weight ignored.", edge);
+                  edge,
+                  weight,
+                  configuration.algorithm().name());
         }
         else {
           graph.addEdge(path.getDestinationPoint().getName(),
-                        path.getSourcePoint().getName(),
-                        edge);
+                  path.getSourcePoint().getName(),
+                  edge);
           graph.setEdgeWeight(edge, weight);
         }
       }
+
     }
 
-    edgeEvaluator.onGraphComputationEnd(vehicle);
-
     return graph;
+
+//    edgeEvaluator.onGraphComputationStart(vehicle);
+//
+//    Graph<String, Edge> graph = new DirectedWeightedMultigraph<>(Edge.class);
+//    Set<String> pointsNames = new HashSet<>();
+//    for (Point point : points) {
+//      graph.addVertex(point.getName());
+//      pointsNames.add(point.getName());
+//    }
+//
+//    boolean allowNegativeEdgeWeights = configuration.algorithm().isHandlingNegativeCosts();
+//
+//    for (Path path : paths) {
+//      if(!pointsNames.contains(path.getSourcePoint().getName())||!pointsNames.contains(path.getDestinationPoint().getName())){
+//        continue;
+//      }
+//      if (shouldAddForwardEdge(path, vehicle)) {
+//        Edge edge = new Edge(path, false);
+//        double weight = edgeEvaluator.computeWeight(edge, vehicle);
+//
+//        if (weight < 0 && !allowNegativeEdgeWeights) {
+//          LOG.warn("Edge {} with weight {} ignored. Algorithm {} cannot handle negative weights.",
+//                   edge,
+//                   weight,
+//                   configuration.algorithm().name());
+//        }
+//        else if (weight == Double.POSITIVE_INFINITY) {
+//          LOG.debug("Edge {} with infinite weight ignored.", edge);
+//        }
+//        else {
+//          graph.addEdge(path.getSourcePoint().getName(),
+//                        path.getDestinationPoint().getName(),
+//                        edge);
+//          graph.setEdgeWeight(edge, weight);
+//        }
+//      }
+//
+//      if (shouldAddReverseEdge(path, vehicle)) {
+//        Edge edge = new Edge(path, true);
+//        double weight = edgeEvaluator.computeWeight(edge, vehicle);
+//
+//        if (weight < 0 && !allowNegativeEdgeWeights) {
+//          LOG.warn("Edge {} with weight {} ignored. Algorithm {} cannot handle negative weights.",
+//                   edge,
+//                   weight,
+//                   configuration.algorithm().name());
+//        }
+//        else if (weight == Double.POSITIVE_INFINITY) {
+//          LOG.debug("Edge {} with infinite weight ignored.", edge);
+//        }
+//        else {
+//          graph.addEdge(path.getDestinationPoint().getName(),
+//                        path.getSourcePoint().getName(),
+//                        edge);
+//          graph.setEdgeWeight(edge, weight);
+//        }
+//      }
+//    }
+//
+//    edgeEvaluator.onGraphComputationEnd(vehicle);
+//
+//    return graph;
   }
 
   /**

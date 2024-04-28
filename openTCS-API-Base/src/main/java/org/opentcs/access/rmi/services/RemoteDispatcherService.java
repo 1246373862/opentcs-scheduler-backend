@@ -7,6 +7,7 @@
  */
 package org.opentcs.access.rmi.services;
 
+import java.lang.module.FindException;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import org.opentcs.access.rmi.ClientID;
@@ -59,5 +60,7 @@ public interface RemoteDispatcherService
   default void assignNow(ClientID clientId, TCSObjectReference<TransportOrder> ref)
       throws RemoteException {
   }
-  // CHECKSTYLE:ON
+
+    void vehicleUpdatedProgressIndex(ClientID clientId) throws RemoteException;
+    // CHECKSTYLE:ON
 }

@@ -18,37 +18,40 @@ import javax.annotation.Resource;
 @RequestMapping("/order")
 public class OrderController extends BaseController {
 
-  @Resource
-  private OrderService orderService;
-  @ApiOperation("分页获取订单列表")
-  @GetMapping("/page")
-  public TableDataInfo page(String name) {
-    startPage();
-    return getDataTable(orderService.getOrders(name));
-  }
+    @Resource
+    private OrderService orderService;
 
-  @ApiOperation("根据编号查询订单")
-  @GetMapping("/select")
-  public AjaxResult selectOneByNumber(String name) {
-    return AjaxResult.success(orderService.selectOneByNumber(name));
-  }
+    @ApiOperation("分页获取订单列表")
+    @GetMapping("/page")
+    public TableDataInfo page(String name) {
+        startPage();
+        return getDataTable(orderService.getOrders(name));
+    }
 
-  @ApiOperation("撤回订单")
-  @PutMapping("/withdraw")
-  public AjaxResult withdrawOrder(@RequestBody  String number) {
-    orderService.withdrawByOrderId(number);
-    return AjaxResult.success();
-  }
-  @ApiOperation("创建订单")
-  @PostMapping("/create")
-  public AjaxResult createOrder(@RequestBody TransportOrderCreationDTO creationDTO) {
-    orderService.createOrder(creationDTO);
-    return AjaxResult.success();
-  }
-  @ApiOperation("修改订单的预执行车辆")
-  @PutMapping("/update")
-  public AjaxResult update(@RequestBody UpdateTransportOrderIntendedVehicleDTO dto) {
-    orderService.updateTransportOrderIntendedVehicle(dto);
-    return AjaxResult.success();
-  }
+    @ApiOperation("根据编号查询订单")
+    @GetMapping("/select")
+    public AjaxResult selectOneByNumber(String name) {
+        return AjaxResult.success(orderService.selectOneByNumber(name));
+    }
+
+    @ApiOperation("撤回订单")
+    @PutMapping("/withdraw")
+    public AjaxResult withdrawOrder(@RequestBody String number) {
+        orderService.withdrawByOrderId(number);
+        return AjaxResult.success();
+    }
+
+    @ApiOperation("创建订单")
+    @PostMapping("/create")
+    public AjaxResult createOrder(@RequestBody TransportOrderCreationDTO creationDTO) {
+        orderService.createOrder(creationDTO);
+        return AjaxResult.success();
+    }
+
+    @ApiOperation("修改订单的预执行车辆")
+    @PutMapping("/update")
+    public AjaxResult update(@RequestBody UpdateTransportOrderIntendedVehicleDTO dto) {
+        orderService.updateTransportOrderIntendedVehicle(dto);
+        return AjaxResult.success();
+    }
 }

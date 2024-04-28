@@ -15,6 +15,7 @@ import java.util.Objects;
 import static java.util.Objects.requireNonNull;
 import java.util.Optional;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import javax.inject.Inject;
 import org.opentcs.components.kernel.Router;
 import org.opentcs.components.kernel.services.InternalTransportOrderService;
@@ -26,6 +27,7 @@ import org.opentcs.data.order.ReroutingType;
 import org.opentcs.data.order.Route;
 import org.opentcs.data.order.Route.Step;
 import org.opentcs.data.order.TransportOrder;
+import org.opentcs.drivers.vehicle.MovementCommand;
 import org.opentcs.drivers.vehicle.VehicleController;
 import org.opentcs.drivers.vehicle.VehicleControllerPool;
 import org.opentcs.strategies.basic.dispatching.DefaultDispatcherConfiguration.ReroutingImpossibleStrategy;
@@ -86,55 +88,197 @@ public class RerouteUtil {
     this.configuration = requireNonNull(configuration, "configuration");
     this.reroutingStrategies = requireNonNull(reroutingStrategies, "reroutingStrategies");
     this.vehiclePositionResolver = requireNonNull(vehiclePositionResolver,
-                                                  "vehiclePositionResolver");
+        "vehiclePositionResolver");
   }
 
-  public void reroute(Collection<Vehicle> vehicles, ReroutingType reroutingType) {
+  public void reroute(Collection<Vehicle> vehicles) {
     for (Vehicle vehicle : vehicles) {
-      reroute(vehicle, reroutingType);
+      reroute(vehicle);
     }
   }
 
-  public void reroute(Vehicle vehicle, ReroutingType reroutingType) {
+  public void reroute(Vehicle vehicle) {
     requireNonNull(vehicle, "vehicle");
     LOG.debug("Trying to reroute vehicle '{}'...", vehicle.getName());
 
     if (!vehicle.isProcessingOrder()) {
-      LOG.debug("{} can't be rerouted without processing a transport order.", vehicle.getName());
+      LOG.warn("{} can't be rerouted without processing a transport order.", vehicle.getName());
       return;
     }
 
     TransportOrder originalOrder = transportOrderService.fetchObject(TransportOrder.class,
-                                                                     vehicle.getTransportOrder());
+        vehicle.getTransportOrder());
 
-    Optional<List<DriveOrder>> optOrders;
-    if (reroutingStrategies.containsKey(reroutingType)) {
-      optOrders = reroutingStrategies.get(reroutingType).reroute(vehicle);
-    }
-    else {
-      LOG.warn("Cannot reroute {} for unknown rerouting type: {}",
-               vehicle.getName(),
-               reroutingType.name());
-      optOrders = Optional.empty();
-    }
+    Point rerouteSource = getFutureOrCurrentPosition(vehicle);
+
+    // Get all unfinished drive order of the transport order the vehicle is processing
+    List<DriveOrder> unfinishedOrders = getUnfinishedDriveOrders(originalOrder);
+
+    // Try to get a new route for the unfinished drive orders from the point
+    Optional<List<DriveOrder>> optOrders = tryReroute(unfinishedOrders,
+        vehicle,
+        rerouteSource);
 
     // Get the drive order with the new route or stick to the old one
     List<DriveOrder> newDriveOrders;
     if (optOrders.isPresent()) {
       newDriveOrders = optOrders.get();
+      LOG.debug("Found a new route for {} from point {}: {}",
+          vehicle.getName(),
+          rerouteSource.getName(),
+          newDriveOrders);
     }
     else {
-      newDriveOrders = updatePathLocksAndRestrictions(vehicle, originalOrder);
+      LOG.debug("Couldn't find a new route for {}. Updating the current one...",
+          vehicle.getName());
+      unfinishedOrders = updatePathLocks(unfinishedOrders);
+      unfinishedOrders
+          = markRestrictedSteps(unfinishedOrders,
+          new ExecutionTest(configuration.reroutingImpossibleStrategy(),
+              rerouteSource));
+      newDriveOrders = unfinishedOrders;
     }
+
+    adjustFirstDriveOrder(newDriveOrders, vehicle, originalOrder, rerouteSource);
 
     LOG.debug("Updating transport order {}...", originalOrder.getName());
     updateTransportOrder(originalOrder, newDriveOrders, vehicle);
   }
+  private void adjustFirstDriveOrder(List<DriveOrder> newDriveOrders,
+                                     Vehicle vehicle,
+                                     TransportOrder originalOrder,
+                                     Point rerouteSource) {
+    // If the vehicle is currently processing a (drive) order (and not waiting to get the next
+    // drive order) we need to take care of it
+    if (vehicle.hasProcState(Vehicle.ProcState.PROCESSING_ORDER)) {
+      if (isPointDestinationOfOrder(rerouteSource, originalOrder.getCurrentDriveOrder())) {
+        // The current drive order could not get rerouted, because the vehicle already
+        // received all commands for it. Therefore we want to keep the original drive order.
+        newDriveOrders.set(0, originalOrder.getCurrentDriveOrder());
+      }
+      else {
+        // Restore the current drive order's history
+        DriveOrder newCurrentOrder = mergeDriveOrders(originalOrder.getCurrentDriveOrder(),
+            newDriveOrders.get(0),
+            vehicle);
+        newDriveOrders.set(0, newCurrentOrder);
+      }
+    }
+  }
+  private List<Path> stepsToPaths(List<Step> steps) {
+    return steps.stream()
+        .map(step -> step.getPath())
+        .collect(Collectors.toList());
+  }
 
+  private List<Step> mergeSteps(List<Step> stepsA, List<Step> stepsB) {
+    LOG.debug("Merging steps {} with {}", stepsToPaths(stepsA), stepsToPaths(stepsB));
+
+    // Get the step where routeB starts to depart, i.e. the step where routeA and routeB share the
+    // same source point
+    Step branchingStep = findStepWithSource(stepsB.get(0).getSourcePoint(), stepsA);
+
+    int branchingIndex = stepsA.indexOf(branchingStep);
+    List<Step> mergedSteps = new ArrayList<>();
+    mergedSteps.addAll(stepsA.subList(0, branchingIndex));
+    mergedSteps.addAll(stepsB);
+
+    // Update the steps route indices since they originate from two different drive orders
+    mergedSteps = updateRouteIndices(mergedSteps);
+
+    return mergedSteps;
+  }
+
+  private List<Step> updateRouteIndices(List<Step> steps) {
+    List<Step> updatedSteps = new ArrayList<>();
+    for (int i = 0; i < steps.size(); i++) {
+      Step currStep = steps.get(i);
+      updatedSteps.add(new Step(currStep.getPath(),
+          currStep.getSourcePoint(),
+          currStep.getDestinationPoint(),
+          currStep.getVehicleOrientation(),
+          i,
+          currStep.isExecutionAllowed()));
+    }
+    return updatedSteps;
+  }
+  private Step findStepWithSource(Point sourcePoint, List<Step> steps) {
+    LOG.debug("Looking for a step with source point {} in {}",
+        sourcePoint,
+        stepsToPaths(steps));
+    return steps.stream()
+        .filter(step -> Objects.equals(step.getSourcePoint(), sourcePoint))
+        .findFirst()
+        .get();
+  }
+
+  private Route mergeRoutes(Vehicle vehicle, Route routeA, Route routeB) {
+    // Merge the route steps
+    List<Step> mergedSteps = mergeSteps(routeA.getSteps(), routeB.getSteps());
+
+    // Calculate the costs for merged route
+    Point sourcePoint = mergedSteps.get(0).getSourcePoint();
+    Point destinationPoint = mergedSteps.get(mergedSteps.size() - 1).getDestinationPoint();
+    long costs = router.getCosts(vehicle, sourcePoint, destinationPoint);
+
+    return new Route(mergedSteps, costs);
+  }
+  public DriveOrder mergeDriveOrders(DriveOrder orderA, DriveOrder orderB, Vehicle vehicle) {
+    // Merge the drive order routes
+    Route mergedRoute = mergeRoutes(vehicle, orderA.getRoute(), orderB.getRoute());
+
+    DriveOrder mergedOrder = new DriveOrder(orderA.getDestination())
+        .withState(orderA.getState())
+        .withTransportOrder(orderA.getTransportOrder())
+        .withRoute(mergedRoute);
+
+    return mergedOrder;
+  }
+  private boolean isPointDestinationOfOrder(Point point, DriveOrder order) {
+    if (point == null || order == null) {
+      return false;
+    }
+    if (order.getRoute() == null) {
+      return false;
+    }
+    return Objects.equals(point, order.getRoute().getFinalDestinationPoint());
+  }
+
+  public Optional<List<DriveOrder>> tryReroute(List<DriveOrder> driveOrders,
+                                               Vehicle vehicle,
+                                               Point sourcePoint) {
+    LOG.debug("Trying to reroute drive orders for {} from {}: {}",
+        vehicle.getName(),
+        sourcePoint,
+        driveOrders);
+    Optional<List<DriveOrder>> optDriveOrders = router.getRoute(vehicle,
+        sourcePoint,
+        new TransportOrder("reroute-dummy",
+            driveOrders));
+    return optDriveOrders;
+  }
+
+  public List<DriveOrder> getUnfinishedDriveOrders(TransportOrder order) {
+    List<DriveOrder> result = new ArrayList<>();
+    result.add(order.getCurrentDriveOrder());
+    result.addAll(order.getFutureDriveOrders());
+    return result;
+  }
+  public Point getFutureOrCurrentPosition(Vehicle vehicle) {
+    VehicleController controller = vehicleControllerPool.getVehicleController(vehicle.getName());
+    if (controller.getCommandsSent().isEmpty()) {
+      return transportOrderService.fetchObject(Point.class, vehicle.getCurrentPosition());
+    }
+
+    List<MovementCommand> commandsSent = new ArrayList<>(controller.getCommandsSent());
+    LOG.debug("Commands sent: {}", commandsSent);
+    MovementCommand lastCommandSend = commandsSent.get(commandsSent.size() - 1);
+    return lastCommandSend.getStep().getDestinationPoint();
+  }
   private List<DriveOrder> updatePathLocksAndRestrictions(Vehicle vehicle,
                                                           TransportOrder originalOrder) {
     LOG.debug("Couldn't find a new route for {}. Updating the current one...",
-              vehicle.getName());
+        vehicle.getName());
     // Get all unfinished drive order of the transport order the vehicle is processing
     List<DriveOrder> unfinishedOrders = new ArrayList<>();
     unfinishedOrders.add(originalOrder.getCurrentDriveOrder());
@@ -144,7 +288,7 @@ public class RerouteUtil {
     unfinishedOrders = markRestrictedSteps(
         unfinishedOrders,
         new ExecutionTest(configuration.reroutingImpossibleStrategy(),
-                          vehiclePositionResolver.getFutureOrCurrentPosition(vehicle))
+            vehiclePositionResolver.getFutureOrCurrentPosition(vehicle))
     );
     return unfinishedOrders;
   }
@@ -162,7 +306,7 @@ public class RerouteUtil {
     // Update the transport order's drive orders with the re-routed ones
     LOG.debug("{}: Updating drive orders with {}.", originalOrder.getName(), newOrders);
     transportOrderService.updateTransportOrderDriveOrders(originalOrder.getReference(),
-                                                          newOrders);
+        newOrders);
 
     // If the vehicle is currently processing a (drive) order (and not waiting to get the next
     // drive order) we need to update the vehicle's current drive order with the new one.
@@ -185,10 +329,10 @@ public class RerouteUtil {
       for (Step step : order.getRoute().getSteps()) {
         Path path = transportOrderService.fetchObject(Path.class, step.getPath().getReference());
         updatedSteps.add(new Route.Step(path,
-                                        step.getSourcePoint(),
-                                        step.getDestinationPoint(),
-                                        step.getVehicleOrientation(),
-                                        step.getRouteIndex()));
+            step.getSourcePoint(),
+            step.getDestinationPoint(),
+            step.getVehicleOrientation(),
+            step.getRouteIndex()));
       }
 
       Route updatedRoute = new Route(updatedSteps, order.getRoute().getCosts());
@@ -220,11 +364,11 @@ public class RerouteUtil {
         boolean executionAllowed = executionTest.test(step);
         LOG.debug("Marking path '{}' allowed: {}", step.getPath(), executionAllowed);
         updatedSteps.add(new Step(step.getPath(),
-                                  step.getSourcePoint(),
-                                  step.getDestinationPoint(),
-                                  step.getVehicleOrientation(),
-                                  step.getRouteIndex(),
-                                  executionAllowed));
+            step.getSourcePoint(),
+            step.getDestinationPoint(),
+            step.getVehicleOrientation(),
+            step.getRouteIndex(),
+            executionAllowed));
       }
 
       Route updatedRoute = new Route(updatedSteps, order.getRoute().getCosts());

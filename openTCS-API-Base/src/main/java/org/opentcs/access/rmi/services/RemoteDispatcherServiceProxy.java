@@ -87,4 +87,14 @@ class RemoteDispatcherServiceProxy
       throw findSuitableExceptionFor(ex);
     }
   }
+
+  @Override
+  public void vehicleUpdatedProgressIndex() {
+    try {
+      getRemoteService().vehicleUpdatedProgressIndex(getClientId());
+
+    }catch (RemoteException e){
+      throw findSuitableExceptionFor(e);
+    }
+  }
 }
